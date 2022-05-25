@@ -1,0 +1,9 @@
+{
+	"name": "adf-cursoudemy-fabio",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "564fb44c-b239-4c0a-9440-06355075bb8d",
+		"tenantId": "9bfbb861-0c2f-465b-a787-1226b2228dbf"
+	}
+}

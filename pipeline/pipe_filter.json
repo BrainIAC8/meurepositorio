@@ -1,0 +1,182 @@
+{
+	"name": "pipe_filter",
+	"properties": {
+		"activities": [
+			{
+				"name": "lkp_csv_single",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_generico_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"containerName": "csvfiles",
+							"fileName": "csvCor.csv",
+							"seperatorName": ";"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "lkp_sql",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_generico_azuresql",
+						"type": "DatasetReference",
+						"parameters": {
+							"schemaName": "SalesLT",
+							"tableName": "ProductCategory"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "fil_getmetadata",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "gmd_metadados_child",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('gmd_metadados_child').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@startswith(item().name, 'C')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "fil_lkpsql",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "lkp_sql",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lkp_sql').output.value",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@contains(item().name, 'Bike')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "fil_lkpcorcsv",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "lkp_csv_single",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lkp_csv_single').output.value",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@not(contains(item().cor, 'azul'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "gmd_metadados_child",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_generico_csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"containerName": "csvfiles",
+							"fileName": "*.csv",
+							"seperatorName": ";"
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "adf_02_activities"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-01-27T21:22:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
