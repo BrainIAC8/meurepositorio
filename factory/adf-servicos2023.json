@@ -1,0 +1,9 @@
+{
+	"name": "adf-servicos2023",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "de51ffd2-ce0c-4238-b328-5de35ea8bbdb",
+		"tenantId": "dc2b8c79-b429-432e-be9d-bcdc901ac868"
+	}
+}
