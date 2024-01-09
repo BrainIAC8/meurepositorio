@@ -1,0 +1,24 @@
+{
+	"name": "trigger1",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pip_data_ingestion",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/bsservicosbstonzip/blobs/",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/78cb5cf0-973a-4916-9cc6-bb89babd8c43/resourceGroups/rg-projetoboston/providers/Microsoft.Storage/storageAccounts/dadosbostonac",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
